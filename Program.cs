@@ -26,8 +26,6 @@
                 ("Enter: pausa Esq: encerrar");
 
                 Relógio.Temporizador(entrada);
-
-                Console.WriteLine("Reinicia tempo");
                 break;
 
             case ConsoleKey.Escape:
