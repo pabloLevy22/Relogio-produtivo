@@ -1,0 +1,15 @@
+C:\estudos\Desenvolvedor\Relogio\bin\Debug\net7.0\Relogio.exe
+C:\estudos\Desenvolvedor\Relogio\bin\Debug\net7.0\Relogio.deps.json
+C:\estudos\Desenvolvedor\Relogio\bin\Debug\net7.0\Relogio.runtimeconfig.json
+C:\estudos\Desenvolvedor\Relogio\bin\Debug\net7.0\Relogio.dll
+C:\estudos\Desenvolvedor\Relogio\bin\Debug\net7.0\Relogio.pdb
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.csproj.AssemblyReference.cache
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.GeneratedMSBuildEditorConfig.editorconfig
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.AssemblyInfoInputs.cache
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.AssemblyInfo.cs
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.csproj.CoreCompileInputs.cache
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.dll
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\refint\Relogio.dll
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.pdb
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\Relogio.genruntimeconfig.cache
+C:\estudos\Desenvolvedor\Relogio\obj\Debug\net7.0\ref\Relogio.dll
