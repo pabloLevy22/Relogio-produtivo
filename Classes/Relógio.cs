@@ -24,17 +24,12 @@ public class Relógio
 
         if (comando.Key == ConsoleKey.Escape)
         {
-            desliga = false;
+            desliga = true;
         }
         else if (comando.Key == ConsoleKey.Enter)
         {
-            if (pausa == false)
-            {
-                pausa = true;
-                return;
-            }
 
-            pausa = false;
+            pausa = !pausa;
         }
         else
             SistemaDeControleDeExercução();
@@ -42,10 +37,10 @@ public class Relógio
 
     public static void Temporizador(int entrada)
     {
-        Relógio relógio = new Relógio() { tempo = entrada, pausa = true, desliga = true };
+        Relógio relógio = new Relógio() { tempo = entrada, pausa = false, desliga = false};
 
         Console.CursorVisible = false;
-        
+
         int linhaAtual = Console.CursorTop;
         do
         {
@@ -58,12 +53,14 @@ public class Relógio
 
                 relógio.tempo--;
                 Thread.Sleep(1000);
-            } while (relógio.tempo >= 0 && relógio.pausa == true && relógio.desliga == true);
+            } while (relógio.tempo >= 0 && !relógio.pausa && !relógio.desliga);
 
-            if (relógio.desliga == true)
-                relógio.SistemaDeControleDeExercução();
+            if (relógio.pausa)
+                relógio.SistemaDeControleDeExercução();               
+            if (relógio.desliga)
+                return;
         }
-        while (relógio.desliga);
+        while (relógio.tempo >= 0);
 
         for (int i = 5; i > -1; i--) Console.Beep();
         Console.CursorVisible = true;
