@@ -2,9 +2,11 @@
 {
     static void Main()
     {
+        Console.Clear();
         Console.WriteLine($"Painel de comando" +
         "\n\nopções de funções:" +
-        "\n     Temporizador: Clique X");
+        "\n     Temporizador: Clique X" + 
+        "\n     Pomodoro    : Clique P");
 
         ComandoDoPainelInicial();
     }
@@ -27,6 +29,10 @@
 
                 Relógio.Temporizador(entrada);
                 break;
+
+                case ConsoleKey.P:
+                    RelógioPomodoro.Pomodoro();
+                    break;
 
             case ConsoleKey.Escape:
                 return;
