@@ -1,6 +1,7 @@
 using System.Data.SqlTypes;
 using System.Net;
 using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using System.Security;
 
 #pragma warning disable SYSLIB0006
@@ -10,8 +11,8 @@ public class Relógio
     public int tempo { get; set; }
     public int segundo { get { return tempo % 60; } set {; } }
     public int minuto { get { return tempo / 60; } set {; } }
-    public bool desliga { get; set; }
-    public bool pausa { get; set; }
+    private bool desliga { get; set; }
+    private bool pausa { get; set; }
     private bool encerrar;
 
     private string MostragemDeTempo()
@@ -24,37 +25,42 @@ public class Relógio
 
     private void SistemaDeControleDeExercução()
     {
-            ConsoleKeyInfo comando = Console.ReadKey();
+        encerrar = true;
+
+        ConsoleKeyInfo comando = new ConsoleKeyInfo();
+
+        do
+        {
+            if (Console.KeyAvailable)
+            {
+                comando = Console.ReadKey();
+            }
 
             if (comando.Key == ConsoleKey.Escape)
             {
                 desliga = true;
+                return;
             }
             else if (comando.Key == ConsoleKey.Enter)
             {
                 pausa = !pausa;
+                return;
             }
-            else
-                SistemaDeControleDeExercução();
-
-            encerrar = true;
+        }
+        while (!encerrar);
     }
 
     public static void Temporizador(int entrada)
     {
-        Relógio relógio = new Relógio() { tempo = entrada, pausa = false, desliga = false };
+        Relógio relógio = new Relógio() { tempo = entrada, pausa = false, desliga = false, encerrar = false };
 
         Console.CursorVisible = false;
-
-        var cancela = new CancellationTokenSource();
 
         int linhaAtual = Console.CursorTop;
         do
         {
-            Task inputTask = Task.Run(() =>
-            {
-                relógio.SistemaDeControleDeExercução();
-            });
+            Task inputTask = Task.Run(relógio.SistemaDeControleDeExercução);
+
             do
             {
                 Console.WriteLine(relógio.MostragemDeTempo());
@@ -62,7 +68,8 @@ public class Relógio
 
                 relógio.tempo--;
                 Thread.Sleep(1000);
-            } while (relógio.tempo >= 0 && !relógio.pausa && !relógio.desliga);
+            } 
+            while (relógio.tempo >= 0 && !relógio.pausa && !relógio.desliga);
 
             if (relógio.pausa)
             {
@@ -72,7 +79,7 @@ public class Relógio
 
             if (relógio.desliga) return;
 
-            cancela.Cancel();
+            relógio.encerrar = true;
         }
         while (relógio.tempo >= 0);
 
@@ -116,11 +123,11 @@ public class RelógioPomodoro : Relógio
                     if (tempoDeTrabalho > 1) tempoDeTrabalho--;
                     continue;
 
-                case ConsoleKey.LeftArrow:
+                case ConsoleKey.RightArrow:
                     if (ciclo < 9) ciclo++;
                     continue;
 
-                case ConsoleKey.RightArrow:
+                case ConsoleKey.LeftArrow:
                     if (ciclo > 1) ciclo--;
                     continue;
 
