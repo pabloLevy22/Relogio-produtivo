@@ -1,7 +1,8 @@
 ﻿public class Program
 {
     static void Main()
-    {
+    {   
+        Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine($"Painel de comando" +
         "\n\nopções de funções:" +
@@ -27,11 +28,18 @@
                 Console.WriteLine
                 ("Enter: pausa Esq: encerrar");
 
-                Relógio.Temporizador(entrada);
+                Relógio relógio = new Relógio{tempo = entrada, encerrar = false};
+
+                Task trabalho = Task.Run(relógio.SistemaDeControleDeExercução);
+                
+                relógio.Temporizador();
+                relógio.encerrar = true;
                 break;
 
                 case ConsoleKey.P:
-                    RelógioPomodoro.Pomodoro();
+                    Relógio	pomodoro = new RelógioPomodoro();
+                    
+                    pomodoro.Funcionalidade();
                     break;
 
             case ConsoleKey.Escape:

@@ -1,19 +1,16 @@
-using System.Data.SqlTypes;
-using System.Net;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
-using System.Security;
-
-#pragma warning disable SYSLIB0006
+using System.ComponentModel.Design;
 
 public class Relógio
 {
     public int tempo { get; set; }
     public int segundo { get { return tempo % 60; } set {; } }
     public int minuto { get { return tempo / 60; } set {; } }
-    private bool desliga { get; set; }
-    private bool pausa { get; set; }
-    private bool encerrar;
+    public bool desliga { get; set; }
+    public bool pausa { get; set; }
+    public bool encerrar { get; set; }
+
+    public virtual void Funcionalidade()
+    {}
 
     private string MostragemDeTempo()
     {
@@ -23,131 +20,65 @@ public class Relógio
         return minutos + ":" + segundos;
     }
 
-    private void SistemaDeControleDeExercução()
+public virtual void SistemaDeControleDeExercução()
+{
+    pausa = false;
+    desliga = false;
+    encerrar = false;
+
+    ConsoleKeyInfo comando;
+
+    do
     {
-        encerrar = true;
+        comando = new ConsoleKeyInfo();
 
-        ConsoleKeyInfo comando = new ConsoleKeyInfo();
-
-        do
+        if (Console.KeyAvailable)
         {
-            if (Console.KeyAvailable)
-            {
-                comando = Console.ReadKey();
-            }
-
-            if (comando.Key == ConsoleKey.Escape)
-            {
-                desliga = true;
-                return;
-            }
-            else if (comando.Key == ConsoleKey.Enter)
-            {
-                pausa = !pausa;
-                return;
-            }
+            comando = Console.ReadKey();
         }
-        while (!encerrar);
-    }
 
-    public static void Temporizador(int entrada)
+        if (comando.Key == ConsoleKey.Escape)
+        {
+            desliga = true;
+        }
+        else if (comando.Key == ConsoleKey.Enter)
+        {
+            pausa = !pausa;
+        }
+    } while (true);
+}
+
+
+    public void Temporizador()
     {
-        Relógio relógio = new Relógio() { tempo = entrada, pausa = false, desliga = false, encerrar = false };
-
-        Console.CursorVisible = false;
-
         int linhaAtual = Console.CursorTop;
         do
         {
-            Task inputTask = Task.Run(relógio.SistemaDeControleDeExercução);
-
             do
             {
-                Console.WriteLine(relógio.MostragemDeTempo());
                 Console.SetCursorPosition(0, linhaAtual);
+                Console.WriteLine(MostragemDeTempo().PadRight(20));
 
-                relógio.tempo--;
+                tempo--;
                 Thread.Sleep(1000);
-            } 
-            while (relógio.tempo >= 0 && !relógio.pausa && !relógio.desliga);
+            }
+            while (tempo >= 0 && !pausa && !desliga);
 
-            if (relógio.pausa)
+            if (pausa)
             {
-                relógio.SistemaDeControleDeExercução();
+                do
+                {
+                    if (desliga) return;
+                }
+                while (pausa);
+
                 continue;
             }
 
-            if (relógio.desliga) return;
-
-            relógio.encerrar = true;
+            if (desliga) return;
         }
-        while (relógio.tempo >= 0);
+        while (tempo >= 0);
 
         for (int i = 5; i > -1; i--) Console.Beep();
-        Console.CursorVisible = true;
-    }
-}
-
-public class RelógioPomodoro : Relógio
-{
-    public static void Pomodoro()
-    {
-        Console.Clear();
-        Console.WriteLine("Defina o numero de ciclos e tempo");
-        SistemaDeSelecionaCiclo();
-    }
-
-    private static void SistemaDeSelecionaCiclo()
-    {
-        int linhaAtual = Console.CursorTop;
-        int ciclo = 4;
-        int tempoDeTrabalho = 20;
-
-        do
-        {
-            Console.SetCursorPosition(0, linhaAtual);
-            Console.WriteLine($"Ciclo:{ciclo}\nTempo:{tempoDeTrabalho} de trabalho" +
-                            $"|{tempoDeTrabalho / 5} descanso|{30} descanso longo");
-            Console.WriteLine("Seta \u2194 para diminuir e aumenta os ciclo" +
-                            "\nSeta \u2195 para diminuir e aumenta tempo");
-
-            ConsoleKeyInfo comando = Console.ReadKey();
-
-            switch (comando.Key)
-            {
-                case ConsoleKey.UpArrow:
-                    if (tempoDeTrabalho < 60) tempoDeTrabalho++;
-                    continue;
-
-                case ConsoleKey.DownArrow:
-                    if (tempoDeTrabalho > 1) tempoDeTrabalho--;
-                    continue;
-
-                case ConsoleKey.RightArrow:
-                    if (ciclo < 9) ciclo++;
-                    continue;
-
-                case ConsoleKey.LeftArrow:
-                    if (ciclo > 1) ciclo--;
-                    continue;
-
-                case ConsoleKey.Enter:
-                    break;
-
-                case ConsoleKey.Escape:
-                    return;
-
-                default:
-                    continue;
-            }
-
-            for (int i = 0; i < ciclo; i++)
-            {
-                Temporizador(tempoDeTrabalho);
-            }
-
-            return;
-        }
-        while (true);
     }
 }
