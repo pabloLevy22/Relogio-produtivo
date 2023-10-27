@@ -25,15 +25,10 @@
                 int.TryParse(Console.ReadLine(), out int entrada);
 
                 Console.Clear();
-                Console.WriteLine
-                ("Enter: pausa Esq: encerrar");
 
-                Relógio relógio = new Relógio{tempo = entrada, encerrar = false};
-
-                Task trabalho = Task.Run(relógio.SistemaDeControleDeExercução);
+                Relógio relógio = new Relógio{tempo = entrada};
                 
-                relógio.Temporizador();
-                relógio.encerrar = true;
+                relógio.Funcionalidade();
                 break;
 
                 case ConsoleKey.P:

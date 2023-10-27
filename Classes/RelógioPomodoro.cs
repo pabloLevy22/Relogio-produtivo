@@ -1,6 +1,7 @@
 public class RelógioPomodoro : Relógio
 {
     private bool _automatico;
+
     private int ciclo { get; set; }
     private bool automatico
     {
@@ -11,14 +12,8 @@ public class RelógioPomodoro : Relógio
         set
         {
             _automatico = value;
-            AtivaPropriedadeAtualizada();
+            OnPropriedadeAtualizada();
         }
-    }
-    public event EventHandler? PropriedadeAtualizada;
-
-    protected virtual void AtivaPropriedadeAtualizada()
-    {
-        PropriedadeAtualizada?.Invoke(this, EventArgs.Empty);
     }
 
     public override void Funcionalidade()
@@ -31,37 +26,37 @@ public class RelógioPomodoro : Relógio
         pomodoro.SistemaDeSelecionaCiclo();
         pomodoro.CicloPomodoro();
     }
-    public override void SistemaDeControleDeExercução()
+    protected override void SistemaDeControleDeExercução()
     {
-        pausa = false;
-        desliga = false;
-        encerrar = false;
+            pausa = false;
+            desliga = false;
+            encerrar = false;
 
-        ConsoleKeyInfo comando;
+            ConsoleKeyInfo comando;
 
-        do
-        {
-            comando = new ConsoleKeyInfo();
+            do
+            {
+                comando = new ConsoleKeyInfo();
 
-            if (Console.KeyAvailable)
-            {
-                comando = Console.ReadKey(true);
-            }
+                if (Console.KeyAvailable)
+                {
+                    comando = Console.ReadKey(true);
+                }
 
-            if (comando.Key == ConsoleKey.Escape)
-            {
-                desliga = true;
+                if (comando.Key == ConsoleKey.Escape)
+                {
+                    desliga = true;
+                }
+                else if (comando.Key == ConsoleKey.Enter)
+                {
+                    pausa = !pausa;
+                }
+                else if (comando.Key == ConsoleKey.A)
+                {
+                    automatico = !automatico;
+                }
             }
-            else if (comando.Key == ConsoleKey.Enter)
-            {
-                pausa = !pausa;
-            }
-            else if (comando.Key == ConsoleKey.A)
-            {
-                automatico = !automatico;
-            }
-        }
-        while (!encerrar);
+            while (true);
     }
 
     private void SistemaDeSelecionaCiclo()
@@ -122,22 +117,24 @@ public class RelógioPomodoro : Relógio
         int descansoLongoCiclo = 0;
         int LinhaDoAutomatico = Console.CursorTop;
 
-        Console.WriteLine($"Trabalho:{trabalhoCiclo}  Descanso:{descansoCiclo} Descanso longo:{descansoLongoCiclo}".PadRight(40));
-        Console.WriteLine("automatico: " + (automatico ? "ligado" : "desligado").PadRight(10) + "\nMuder apertado 'A'");
+        var cancellationTokenSource = new CancellationTokenSource();
+
+        Task tarefa = Task.Run(SistemaDeControleDeExercução);
 
         PropriedadeAtualizada += (sender, args) =>
         {
-            Console.SetCursorPosition(0, LinhaDoAutomatico);
-            Console.WriteLine($"Trabalho:{trabalhoCiclo}  Descanso:{descansoCiclo} Descanso longo:{descansoLongoCiclo}".PadRight(40));
-            Console.WriteLine("automatico: " + (automatico ? "ligado" : "desligado").PadRight(10) + "\nMuder apertado 'A'");
+            lock (consoleLock)
+            {
+                Console.SetCursorPosition(0, LinhaDoAutomatico);
+                Console.WriteLine($"Trabalho:{trabalhoCiclo}  Descanso:{descansoCiclo} Descanso longo:{descansoLongoCiclo}".PadRight(40));
+                Console.WriteLine("automatico: " + (automatico ? "ligado" : "desligado").PadRight(10) + "Muder apertado 'A'");
+                Console.WriteLine($"Enter: {(pausa ? "Despausa" : "Pausa").PadRight(9)}Esq: Encerrar".PadRight(10));
+                Console.WriteLine(MostragemDeTempo().PadRight(10));
+            }
         };
 
         do
         {
-            AtivaPropriedadeAtualizada();
-
-            Task tarefa = Task.Run(SistemaDeControleDeExercução);
-
             if (trabalhoCiclo == descansoCiclo + descansoLongoCiclo)
             {
                 tempo = tempoOriginal;
@@ -165,24 +162,23 @@ public class RelógioPomodoro : Relógio
 
             if (ciclo == descansoCiclo + descansoLongoCiclo)
             {
-                encerrar = true;
                 return;
             }
             else if (automatico)
             {
-                encerrar = true;
+                desliga = false;
 
                 continue;
             }
-
-            encerrar = true;
+            
+            desliga = false;
 
             do
             {
                 Console.Clear();
                 Console.WriteLine("Continua(S) ou não(N)?");
 
-                ConsoleKeyInfo comando = Console.ReadKey();
+                ConsoleKeyInfo comando = Console.ReadKey(true);
 
                 if (comando.Key == ConsoleKey.S)
                     break;
