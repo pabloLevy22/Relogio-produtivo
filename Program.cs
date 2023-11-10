@@ -1,12 +1,13 @@
 ﻿public class Program
 {
     static void Main()
-    {   
+    {
         Console.CursorVisible = false;
         Console.Clear();
         Console.WriteLine($"Painel de comando" +
         "\n\nopções de funções:" +
-        "\n     Temporizador: Clique X" + 
+        "\n     Temporizador: Clique T" +
+        "\n     Cronometro  : Clique C" +
         "\n     Pomodoro    : Clique P");
 
         ComandoDoPainelInicial();
@@ -14,11 +15,11 @@
 
     static void ComandoDoPainelInicial()
     {
-        ConsoleKeyInfo tecla = Console.ReadKey();
+        ConsoleKeyInfo tecla = Console.ReadKey(true);
 
         switch (tecla.Key)
         {
-            case ConsoleKey.X:
+            case ConsoleKey.T:
                 Console.Clear();
                 Console.WriteLine("insirar os segundos");
 
@@ -26,16 +27,23 @@
 
                 Console.Clear();
 
-                Relógio relógio = new Relógio{tempo = entrada};
-                
+                Relógio relógio = new RelógioTemporizador {};
+
                 relógio.Funcionalidade();
                 break;
 
-                case ConsoleKey.P:
-                    Relógio	pomodoro = new RelógioPomodoro();
-                    
-                    pomodoro.Funcionalidade();
-                    break;
+            case ConsoleKey.P:
+                Relógio pomodoro = new RelógioTemporizadorPomodoro();
+
+                pomodoro.Funcionalidade();
+                break;
+            case ConsoleKey.C:
+                Console.Clear();
+
+                Relógio cronometro = new RelógioCronometro();
+
+                cronometro.Funcionalidade();
+                break;
 
             case ConsoleKey.Escape:
                 return;

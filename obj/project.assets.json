@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\estudos\\Desenvolvedor\\Relogio\\Relogio.csproj",
+      "projectUniqueName": "C:\\Users\\faete\\OneDrive\\Documentos\\Projeto\\Relogio\\Relogio.csproj",
       "projectName": "Relogio",
-      "projectPath": "C:\\estudos\\Desenvolvedor\\Relogio\\Relogio.csproj",
+      "projectPath": "C:\\Users\\faete\\OneDrive\\Documentos\\Projeto\\Relogio\\Relogio.csproj",
       "packagesPath": "C:\\Users\\faete\\.nuget\\packages\\",
-      "outputPath": "C:\\estudos\\Desenvolvedor\\Relogio\\obj\\",
+      "outputPath": "C:\\Users\\faete\\OneDrive\\Documentos\\Projeto\\Relogio\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\faete\\AppData\\Roaming\\NuGet\\NuGet.Config"
