@@ -13,7 +13,7 @@ public class RelógioCronometro : Relógio
         eventoRelógio?.Invoke(this, EventArgs.Empty);
     }
 
-    protected override void SistemaDeControleDeExercução()
+    protected override void SistemaDeControleDeExercução(Task objeto)
     {
         ConsoleKeyInfo comando;
 
@@ -34,10 +34,10 @@ public class RelógioCronometro : Relógio
             {
                 pausa = !pausa;
             }
-        } while (true);
+        } while (!objeto.IsCompleted);
     }
 
-    protected async void Cronometro()
+    protected async Task Cronometro()
     {
         pausa = false;
         desliga = false;
@@ -72,7 +72,7 @@ public class RelógioCronometro : Relógio
             }
         };
 
-        Cronometro();
-        SistemaDeControleDeExercução();
+        Task cronometro = Cronometro();
+        SistemaDeControleDeExercução(cronometro);
     }
 }

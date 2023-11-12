@@ -18,7 +18,7 @@ public abstract class Relógio
         return minutos + ":" + segundos;
     }
 
-    protected abstract void SistemaDeControleDeExercução();
+    protected abstract void SistemaDeControleDeExercução(Task objeto);
 
     public abstract void Funcionalidade();
 }

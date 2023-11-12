@@ -12,7 +12,7 @@ public class RelógioTemporizador : Relógio
         eventoRelógio?.Invoke(this, EventArgs.Empty);
     }
 
-    protected override void SistemaDeControleDeExercução()
+    protected override void SistemaDeControleDeExercução(Task objeto)
     {
         ConsoleKeyInfo comando;
 
@@ -33,7 +33,7 @@ public class RelógioTemporizador : Relógio
             {
                 pausa = !pausa;
             }
-        } while (!desliga);
+        } while (!objeto.IsCompleted);
     }
     protected async Task Temporizador()
     {
@@ -53,7 +53,7 @@ public class RelógioTemporizador : Relógio
 
             await Task.Delay(1000);
         }
-        while (tempo >= 0);
+        while (tempo > 0);
 
         for (int i = 5; i > -1; i--) Console.Beep();
     }
@@ -73,7 +73,7 @@ public class RelógioTemporizador : Relógio
         };
 
         Task temporizar = Temporizador();
-        SistemaDeControleDeExercução();
+        SistemaDeControleDeExercução(temporizar);
 
         temporizar.Wait();
     }

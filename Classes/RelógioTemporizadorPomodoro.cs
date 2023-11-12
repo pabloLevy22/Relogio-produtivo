@@ -1,3 +1,5 @@
+using System.Net;
+
 public class RelógioTemporizadorPomodoro : RelógioTemporizador
 {
     private int _cicloTrabalho;
@@ -21,7 +23,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
         Encerrar = false;
     }
 
-    protected override void SistemaDeControleDeExercução()
+    protected override void SistemaDeControleDeExercução(Task objeto)
     {
         ConsoleKeyInfo comando;
 
@@ -48,7 +50,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
                 automatico = !automatico;
             }
         }
-        while (true);
+        while (!objeto.IsCompleted);
     }
 
     private void AlterarTempoManualmente()
@@ -92,7 +94,10 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
     {
         Console.Clear();
 
-        bool definidoEntreDescansoETrabalho = false;
+        automatico = false;
+        Encerrar = false;
+
+        bool definidoEntreDescansoETrabalho = true;
 
         int tempoAnterior = 0;
         int linhaAtual = Console.CursorTop;
@@ -111,52 +116,63 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
 
         tempo = 20 * 60;
 
-        AlterarTempoManualmente();
-
-        cicloTrabalho++;
-        tempoAnterior = tempo;
-
-
-        Task temporizar = Temporizador();
-
-        SistemaDeControleDeExercução();
-
-        temporizar.Wait();
-
-        while (!Encerrar)
+        while (true)
         {
-            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0)
-            {
-                tempo = 15 * 60;
-                cicloDescansoLongo++;
-            }
-            else if (!definidoEntreDescansoETrabalho)
-            {
-                tempo = tempoAnterior;
-                cicloDescanso++;
-
-                definidoEntreDescansoETrabalho = !definidoEntreDescansoETrabalho;
-            }
-            else
-            {
-                tempo = (int)(tempoAnterior * 0.20);
-                cicloTrabalho++;
-
-                definidoEntreDescansoETrabalho = !definidoEntreDescansoETrabalho;
-            }
-
             if (!automatico)
             {
                 AlterarTempoManualmente();
 
+                if (Encerrar) break;
+
                 if (definidoEntreDescansoETrabalho)
+                {
                     tempoAnterior = tempo;
+                }
             }
 
-            temporizar = Temporizador();
-            SistemaDeControleDeExercução();
+            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0)
+                cicloDescansoLongo++;
+            else if (definidoEntreDescansoETrabalho)
+                cicloTrabalho++;
+            else
+                cicloDescanso++;
+
+            Task temporizar = Temporizador();
+
+            SistemaDeControleDeExercução(temporizar);
 
             temporizar.Wait();
+
+            definidoEntreDescansoETrabalho = !definidoEntreDescansoETrabalho;
+
+            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0 && !definidoEntreDescansoETrabalho)
+            {
+                tempo = 15 * 60;
+
+                continue;
+            }
+
+            if (definidoEntreDescansoETrabalho)
+            {
+                tempo = tempoAnterior;
+            }
+            else
+            {
+                int tempoDecorrido = tempoAnterior - tempo;
+
+                if (tempoDecorrido >= 20 * 60 && tempoDecorrido <= 25 * 60)
+                {
+                    tempo = 5;
+                }
+                else if (tempoDecorrido < 20 * 60)
+                {
+                    tempo = tempoDecorrido * 5 / 20;
+                }
+                else
+                {
+                    tempo = tempoDecorrido * 5 / 25;
+                }
+            }
         }
     }
 }
