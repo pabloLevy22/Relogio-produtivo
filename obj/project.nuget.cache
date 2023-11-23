@@ -1,8 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "xLkYrNT+gBp5jM6zZy/SNL4IQYjLcOX6PYGeRem7X6x0pbO60GBu01dh2+Ag91gsSlxm5nIQZ0oFQG2MxpVYMg==",
+  "dgSpecHash": "JSdJTFKPXUuNcoK/LF3pqYD4b4RDg0xTyBlPnZPyU08wVIeLpYwX3WW7GRGP4GgZHVwJXByb7WtIsubuTncBnA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\faete\\OneDrive\\Documentos\\Projeto\\Relogio\\Relogio.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "D:\\Projeto\\Relogio\\Relogio.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\faete\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.14\\microsoft.netcore.app.ref.7.0.14.nupkg.sha512",
+    "C:\\Users\\faete\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.14\\microsoft.windowsdesktop.app.ref.7.0.14.nupkg.sha512",
+    "C:\\Users\\faete\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.14\\microsoft.aspnetcore.app.ref.7.0.14.nupkg.sha512",
+    "C:\\Users\\faete\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\7.0.14\\microsoft.netcore.app.host.win-x64.7.0.14.nupkg.sha512"
+  ],
   "logs": []
 }

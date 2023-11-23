@@ -1,15 +1,15 @@
 public class RelógioTemporizador : Relógio
 {
 
-    public event EventHandler? eventoRelógio;
+    public event EventHandler? eventoTemporizador;
     public static object consoleLock = new object();
 
-    public sealed override int tempo { get { return _tempo; } set { _tempo = value; OnPropriedadeAtualizada(); } }
-    protected sealed override bool pausa { get { return _pausa; } set { _pausa = value; OnPropriedadeAtualizada(); } }
+    public override int tempo { get { return _tempo; } set { _tempo = value; OnPropriedadeAtualizadaTemporizar(); } }
+    protected sealed override bool pausa { get { return _pausa; } set { _pausa = value; OnPropriedadeAtualizadaTemporizar(); } }
 
-    protected virtual void OnPropriedadeAtualizada()
+    protected virtual void OnPropriedadeAtualizadaTemporizar()
     {
-        eventoRelógio?.Invoke(this, EventArgs.Empty);
+        eventoTemporizador?.Invoke(this, EventArgs.Empty);
     }
 
     protected override void SistemaDeControleDeExercução(Task objeto)
@@ -40,7 +40,7 @@ public class RelógioTemporizador : Relógio
         pausa = false;
         desliga = false;
 
-        do
+        while (tempo > 0)
         {
             while (pausa)
             {
@@ -53,7 +53,6 @@ public class RelógioTemporizador : Relógio
 
             await Task.Delay(1000);
         }
-        while (tempo > 0);
 
         for (int i = 5; i > -1; i--) Console.Beep();
     }
@@ -62,7 +61,7 @@ public class RelógioTemporizador : Relógio
     {
         int linhaAtual = Console.CursorTop;
 
-        eventoRelógio += (sender, args) =>
+        eventoTemporizador += (sender, args) =>
         {
             lock (consoleLock)
             {
@@ -74,7 +73,5 @@ public class RelógioTemporizador : Relógio
 
         Task temporizar = Temporizador();
         SistemaDeControleDeExercução(temporizar);
-
-        temporizar.Wait();
     }
 }

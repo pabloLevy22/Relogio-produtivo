@@ -1,4 +1,5 @@
 using System.Net;
+using System.Runtime.CompilerServices;
 
 public class RelógioTemporizadorPomodoro : RelógioTemporizador
 {
@@ -7,11 +8,20 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
     private int _cicloDescansoLongo;
     private bool _automatico;
 
-    private int cicloTrabalho { get { return _cicloTrabalho; } set { _cicloTrabalho = value; OnPropriedadeAtualizada(); } }
-    private int cicloDescanso { get { return _cicloDescanso; } set { _cicloDescanso = value; OnPropriedadeAtualizada(); } }
-    private int cicloDescansoLongo { get { return _cicloDescansoLongo; } set { _cicloDescansoLongo = value; OnPropriedadeAtualizada(); } }
-    private bool automatico { get { return _automatico; } set { _automatico = value; OnPropriedadeAtualizada(); } }
+    public event EventHandler? eventoInterfase;
+
+    private int cicloTrabalho { get { return _cicloTrabalho; } set { _cicloTrabalho = value; OnPropriedadeAtualizadaInterfase(); } }
+    private int cicloDescanso { get { return _cicloDescanso; } set { _cicloDescanso = value; OnPropriedadeAtualizadaInterfase(); } }
+    private int cicloDescansoLongo { get { return _cicloDescansoLongo; } set { _cicloDescansoLongo = value; OnPropriedadeAtualizadaInterfase(); } }
+    private bool automatico { get { return _automatico; } set { _automatico = value; OnPropriedadeAtualizadaInterfase(); } }
     private bool Encerrar { get; set; }
+
+    public override int tempo { get { return _tempo; } set { _tempo = value; OnPropriedadeAtualizadaInterfase(); } }
+
+    protected virtual void OnPropriedadeAtualizadaInterfase()
+    {
+        eventoInterfase?.Invoke(this, EventArgs.Empty);
+    }
 
     public RelógioTemporizadorPomodoro()
     {
@@ -19,7 +29,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
         cicloDescanso = 0;
         cicloDescansoLongo = 0;
 
-        automatico = true;
+        automatico = false;
         Encerrar = false;
     }
 
@@ -39,7 +49,6 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
             if (comando.Key == ConsoleKey.Escape)
             {
                 desliga = true;
-                return;
             }
             else if (comando.Key == ConsoleKey.Enter)
             {
@@ -53,7 +62,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
         while (!objeto.IsCompleted);
     }
 
-    private void AlterarTempoManualmente()
+    private Task AlterarTempoManualmente()
     {
         ConsoleKeyInfo comando;
 
@@ -73,7 +82,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
                     continue;
 
                 case ConsoleKey.Enter:
-                    return;
+                    return Task.CompletedTask;
 
                 case ConsoleKey.A:
                     automatico = !automatico;
@@ -81,7 +90,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
 
                 case ConsoleKey.Escape:
                     Encerrar = true;
-                    return;
+                    return Task.CompletedTask;
 
                 default:
                     continue;
@@ -90,37 +99,86 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
         while (true);
     }
 
+    private int CalculoPomodoro(int tempoAnterior, bool definidoEntreDescansoETrabalho)
+    {
+        int tempoIntermediário = tempoAnterior - tempo;
+
+        if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0 && !definidoEntreDescansoETrabalho)
+        {
+            tempoIntermediário = 900;
+        }
+        else if (definidoEntreDescansoETrabalho)
+        {
+            tempoIntermediário = tempoAnterior;
+        }
+        else if (tempoIntermediário >= 1200 && tempoIntermediário <= 1500)
+        {
+            tempoIntermediário = 300;
+        }
+        else if (tempoIntermediário <= 240)
+        {
+            tempoIntermediário = 60;
+        }
+        else
+        {
+            tempoIntermediário = tempoIntermediário < 1200 ? tempoIntermediário * 5 / 20 : tempoIntermediário * 5 / 25;
+
+            tempoIntermediário -= tempoIntermediário % 60;
+        }
+
+        return tempoIntermediário;
+    }
+
+    static void LimparLinha(int numeroLinha)
+    {
+        int windowHeight = Console.WindowHeight;
+        if (numeroLinha >= 0 && numeroLinha < windowHeight)
+        {
+            Console.SetCursorPosition(0, numeroLinha);
+
+            string espacos = new string(' ', Console.WindowWidth);
+            Console.Write(espacos);
+        }
+    }
+
     public override void Funcionalidade()
     {
         Console.Clear();
 
-        automatico = false;
-        Encerrar = false;
-
         bool definidoEntreDescansoETrabalho = true;
 
         int tempoAnterior = 0;
-        int linhaAtual = Console.CursorTop;
+        int linhaAtualInterfase = Console.CursorTop;
 
-        eventoRelógio += (sender, args) =>
+        eventoInterfase += (sender, args) =>
         {
             lock (consoleLock)
             {
-                Console.SetCursorPosition(0, linhaAtual);
-                Console.WriteLine($"Trabalho:{cicloTrabalho}    Descanso:{cicloDescanso}    Descanso longo:{cicloDescansoLongo}".PadRight(40));
-                Console.WriteLine("automatico: " + (automatico ? "ligado" : "desligado").PadRight(9) + "Muder apertado 'A'".PadLeft(4));
-                Console.WriteLine($"Enter: {(pausa ? "Despausa" : "Pausa").PadRight(8)}Esq: Encerrar".PadRight(10).PadLeft(4));
+                Console.SetCursorPosition(0, linhaAtualInterfase);
+                Console.WriteLine($"Trabalho:{cicloTrabalho}    Descanso:{cicloDescanso}    Descanso longo:{cicloDescansoLongo}".PadRight(50));
                 Console.WriteLine(MostragemDeTempo().PadRight(10));
+                Console.WriteLine(("automatico; " + (automatico ? "ligado" : "desligado") + ": A" + "   Encerrar: Esc").PadRight(50));
             }
         };
 
-        tempo = 20 * 60;
+        tempo = 1200;
+
+        int linhaAtualTemporizar = Console.CursorTop;
+
+        eventoTemporizador += (sender, args) =>
+        {
+            lock (consoleLock)
+            {
+                Console.SetCursorPosition(0, linhaAtualTemporizar);
+                Console.WriteLine($"Enter: {(pausa ? "Despausa" : "Pausa").PadRight(9)}Esc: Encerrar execução".PadRight(10));
+            }
+        };
 
         while (true)
         {
             if (!automatico)
             {
-                AlterarTempoManualmente();
+                Task alterarTempoManualmente = AlterarTempoManualmente();
 
                 if (Encerrar) break;
 
@@ -130,7 +188,7 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
                 }
             }
 
-            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0)
+            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0 && !definidoEntreDescansoETrabalho)
                 cicloDescansoLongo++;
             else if (definidoEntreDescansoETrabalho)
                 cicloTrabalho++;
@@ -138,41 +196,12 @@ public class RelógioTemporizadorPomodoro : RelógioTemporizador
                 cicloDescanso++;
 
             Task temporizar = Temporizador();
-
             SistemaDeControleDeExercução(temporizar);
-
-            temporizar.Wait();
+            LimparLinha(linhaAtualTemporizar);
 
             definidoEntreDescansoETrabalho = !definidoEntreDescansoETrabalho;
 
-            if (cicloTrabalho % 4 == 0 && cicloTrabalho != 0 && !definidoEntreDescansoETrabalho)
-            {
-                tempo = 15 * 60;
-
-                continue;
-            }
-
-            if (definidoEntreDescansoETrabalho)
-            {
-                tempo = tempoAnterior;
-            }
-            else
-            {
-                int tempoDecorrido = tempoAnterior - tempo;
-
-                if (tempoDecorrido >= 20 * 60 && tempoDecorrido <= 25 * 60)
-                {
-                    tempo = 5;
-                }
-                else if (tempoDecorrido < 20 * 60)
-                {
-                    tempo = tempoDecorrido * 5 / 20;
-                }
-                else
-                {
-                    tempo = tempoDecorrido * 5 / 25;
-                }
-            }
+            tempo = CalculoPomodoro(tempoAnterior, definidoEntreDescansoETrabalho);
         }
     }
 }
