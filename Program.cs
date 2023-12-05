@@ -8,7 +8,8 @@
         "\n\nopções de funções:" +
         "\n     Temporizador: Clique T" +
         "\n     Cronometro  : Clique C" +
-        "\n     Pomodoro    : Clique P");
+        "\n     Pomodoro    : Clique P" +
+        "\n     Desempenho  : Clique D");
 
         ComandoDoPainelInicial();
     }
@@ -37,12 +38,16 @@
 
                 pomodoro.Funcionalidade();
                 break;
+
             case ConsoleKey.C:
                 Console.Clear();
 
                 Relógio cronometro = new RelógioCronometro();
 
                 cronometro.Funcionalidade();
+                break;
+            
+            case ConsoleKey.D:
                 break;
 
             case ConsoleKey.Escape:
